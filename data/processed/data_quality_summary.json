@@ -1,0 +1,16 @@
+{
+  "rows": 52416,
+  "columns": 9,
+  "missing_cells": 0,
+  "bad_timestamps": 0,
+  "duplicate_timestamps": 0,
+  "non_10min_gaps": 0,
+  "start": "2017-01-01 00:00:00",
+  "end": "2017-12-30 23:50:00",
+  "hourly_rows_after_aggregation": 8736,
+  "incomplete_hours": 0,
+  "model_rows_after_feature_warmup": 8568,
+  "target": "system_load",
+  "forecast_horizon": "1 hour ahead",
+  "aggregation": "hourly mean load/weather"
+}
