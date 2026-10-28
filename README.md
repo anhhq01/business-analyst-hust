@@ -129,3 +129,11 @@ Prioritize these, in order:
 6. SHAP only after validation is stable.
 
 Do not jump to LSTM before the temporal baseline and business decision rule are defensible.
+
+---
+
+## Live browser demo (new)
+
+Run `streamlit run app.py` after `pip install -r requirements.txt`; open **http://localhost:8501**. Uses the included historical predictions (no retraining necessary). Four tabs: Forecast overview, Error diagnostics, Capacity decisions, Evidently monitoring. Details and demo script: [`docs/dashboard_demo.md`](docs/dashboard_demo.md).
+
+This is an **interactive historical scenario demo**, not a live grid data feed. Changing the threshold or reserve margin recalculates evaluation/scenario outputs without retraining. The optional residual band is descriptive, not a validated prediction interval.
