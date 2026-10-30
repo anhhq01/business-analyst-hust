@@ -50,7 +50,9 @@ def fit_baseline(data_path: Path | str = PROCESSED_DATA):
     )
     model.fit(
         train[features], train[TARGET],
-        eval_set=[(valid[features], valid[TARGET])],
+        # eval_set=[(valid[features], valid[TARGET])],
+        eval_X=valid[features],
+        eval_y=valid[TARGET],
         eval_metric='mae',
         callbacks=[lgb.early_stopping(75, verbose=False)],
     )
@@ -96,7 +98,10 @@ def fit_baseline(data_path: Path | str = PROCESSED_DATA):
     test[keep].to_csv(PREDICTIONS, index=False)
     METRICS.write_text(json.dumps(metrics, indent=2), encoding='utf-8')
     MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-    model.booster_.save_model(str(MODEL_PATH))
+    # LightGBM's native file writer can fail on Windows when the project path
+    # contains non-ASCII characters. Serialize the model in Python and let
+    # pathlib perform the Unicode-safe write instead.
+    MODEL_PATH.write_text(model.booster_.model_to_string(), encoding='utf-8')
     return model, metrics, test[keep]
 
 

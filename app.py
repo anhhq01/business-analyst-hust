@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+from sklearn.metrics import r2_score
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / 'src'))
@@ -21,7 +22,6 @@ from evaluation import regression_metrics, peak_metrics  # noqa: E402
 
 PREDICTIONS = ROOT / 'reports' / 'predictions.csv'
 METRICS = ROOT / 'reports' / 'metrics.json'
-EVIDENTLY_HTML = ROOT / 'reports' / 'evidently_regression.html'
 
 st.set_page_config(page_title='Tetouan | Electricity Demand', page_icon='⚡', layout='wide')
 
@@ -134,7 +134,7 @@ k4.metric('Peak precision', f"{peaks['peak_precision']*100:.1f}%" if peaks['pred
 k5.metric('Breaches anticipated', f"{peaks['breaches_correctly_anticipated']}/{peaks['actual_breaches']}")
 
 main, diagnostics, planning, monitoring = st.tabs([
-    'Forecast overview', 'Error diagnostics', 'Capacity decisions', 'Evidently monitoring'
+    'Forecast overview', 'Error diagnostics', 'Capacity decisions', 'Monitoring'
 ])
 with main:
     st.plotly_chart(forecast_plot(df, predicted, threshold, show_band), width='stretch')
@@ -186,33 +186,144 @@ with planning:
             st.dataframe(display, width='stretch', hide_index=True)
         st.download_button('Download selected scenario CSV', alerts.to_csv(index=False).encode('utf-8'),
                            file_name='capacity_scenario.csv', mime='text/csv')
+
+    st.subheader('Sensitivity analysis')
+    st.caption('Threshold sweep is anchored on the training-set 80th-percentile threshold; reserve sweep varies the illustrative margin. These are test-set scenario comparisons, not expected savings or operational forecasts.')
+    reference_threshold = float(saved_metrics.get('peak_capacity_scenario', {}).get('capacity_threshold', threshold))
+    threshold_grid = np.linspace(reference_threshold * .85, reference_threshold * 1.15, 31)
+    sensitivity_rows = []
+    for test_threshold in threshold_grid:
+        result = peak_metrics(df['system_load'], df[predicted], float(test_threshold))
+        tp = result['breaches_correctly_anticipated']
+        sensitivity_rows.append({
+            'threshold': test_threshold,
+            'precision (%)': (result['peak_precision'] or 0) * 100,
+            'recall (%)': (result['peak_recall'] or 0) * 100,
+            'actual breaches': result['actual_breaches'],
+            'false alerts': result['predicted_breaches'] - tp,
+            'missed breaches': result['actual_breaches'] - tp,
+        })
+    threshold_sensitivity = pd.DataFrame(sensitivity_rows)
+    sens_col, reserve_col = st.columns(2)
+    with sens_col:
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=threshold_sensitivity['threshold'], y=threshold_sensitivity['precision (%)'], name='Precision', mode='lines'))
+        fig.add_trace(go.Scatter(x=threshold_sensitivity['threshold'], y=threshold_sensitivity['recall (%)'], name='Recall', mode='lines'))
+        fig.add_vline(x=threshold, line_dash='dash', line_color='#ea580c', annotation_text='Current threshold')
+        fig.update_layout(title='Peak alert trade-off by threshold', xaxis_title='Scenario threshold (source units)', yaxis_title='Percent', height=350)
+        st.plotly_chart(fig, width='stretch')
+    with reserve_col:
+        reserve_grid = np.arange(0, 31, 5)
+        reserve_sensitivity = pd.DataFrame([
+            {
+                'reserve margin (%)': margin,
+                'hours with extra reserve': int((df[predicted] * (1 + margin / 100) > threshold).sum()),
+                'maximum extra reserve': float(np.maximum(0, df[predicted] * (1 + margin / 100) - threshold).max()),
+            }
+            for margin in reserve_grid
+        ])
+        fig = go.Figure(go.Scatter(x=reserve_sensitivity['reserve margin (%)'],
+                                   y=reserve_sensitivity['maximum extra reserve'],
+                                   mode='lines+markers', name='Maximum extra reserve'))
+        fig.update_layout(title='Reserve requirement by margin', xaxis_title='Reserve margin (%)',
+                          yaxis_title='Maximum extra reserve (source units)', height=350)
+        st.plotly_chart(fig, width='stretch')
+    with st.expander('Sensitivity values'):
+        st.dataframe(threshold_sensitivity, width='stretch', hide_index=True)
+        st.dataframe(reserve_sensitivity, width='stretch', hide_index=True)
     st.warning('This is a scenario comparison, not a causal claim or operational recommendation. No true grid capacity, intervention costs or measured savings are provided by this dataset.')
 
 with monitoring:
-    st.markdown('**Evidently** evaluates the existing holdout output, independently of the capacity slider.')
-    if EVIDENTLY_HTML.exists():
-        st.success('Saved Evidently report found.')
-        st.download_button('Download Evidently HTML', EVIDENTLY_HTML.read_bytes(),
-                           file_name='evidently_regression.html', mime='text/html')
-        if st.checkbox('Embed saved Evidently report', value=False):
-            # Local trusted report generated by this project, not user-supplied HTML.
-            if hasattr(st, 'iframe'):
-                st.iframe(EVIDENTLY_HTML, height=850)
-            else:
-                from streamlit.components.v1 import html
-                html(EVIDENTLY_HTML.read_text(encoding='utf-8'), height=850, scrolling=True)
+    st.subheader('Historical forecast monitoring')
+    st.caption('This view surfaces the same kinds of regression quality and data-summary details as the Evidently report, calculated in the selected period. It is retrospective monitoring, not live telemetry or production drift detection.')
+    monitor = df[['timestamp', 'system_load', predicted]].copy()
+    monitor['error'] = monitor[predicted] - monitor['system_load']
+    monitor['absolute_percentage_error'] = (
+        monitor['error'].abs() / monitor['system_load'].abs().replace(0, np.nan) * 100
+    )
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric('R²', f"{r2_score(monitor['system_load'], monitor[predicted]):.3f}" if len(monitor) > 1 else 'N/A')
+    m2.metric('Mean error (forecast − actual)', f"{monitor['error'].mean():,.1f}")
+    m3.metric('MAPE', f"{monitor['absolute_percentage_error'].mean():.2f}%")
+    m4.metric('Maximum absolute error', f"{monitor['error'].abs().max():,.1f}")
+
+    daily_rows = []
+    for day, part in monitor.groupby(monitor['timestamp'].dt.floor('D'), sort=True):
+        daily_rows.append({
+            'date': day,
+            'mean_error': part['error'].mean(),
+            'mae': part['error'].abs().mean(),
+            'mape (%)': part['absolute_percentage_error'].mean(),
+        })
+    daily = pd.DataFrame(daily_rows)
+    daily_metric = st.selectbox('Daily error metric', ['mean_error', 'mae', 'mape (%)'], key='daily_monitor_metric')
+    daily_fig = go.Figure(go.Scatter(x=daily['date'], y=daily[daily_metric], mode='lines+markers'))
+    if daily_metric == 'mean_error':
+        daily_fig.add_hline(y=0, line_dash='dash', line_color='#64748b')
+    daily_fig.update_layout(height=330, xaxis_title='Date', yaxis_title=daily_metric,
+                            margin=dict(l=8, r=8, t=24, b=8))
+    st.plotly_chart(daily_fig, width='stretch')
+
+    dist_col, ape_col = st.columns(2)
+    with dist_col:
+        fig = go.Figure()
+        fig.add_trace(go.Histogram(x=monitor['system_load'], name='Actual', opacity=.6))
+        fig.add_trace(go.Histogram(x=monitor[predicted], name='Forecast', opacity=.6))
+        fig.update_layout(title='Actual and forecast distributions', barmode='overlay',
+                          xaxis_title='Load (source measurement units)', yaxis_title='Hours', height=330)
+        st.plotly_chart(fig, width='stretch')
+    with ape_col:
+        fig = go.Figure(go.Histogram(x=monitor['absolute_percentage_error'], nbinsx=30,
+                                     marker_color='#7c3aed'))
+        fig.update_layout(title='Absolute percentage error distribution',
+                          xaxis_title='Absolute percentage error (%)', yaxis_title='Hours', height=330)
+        st.plotly_chart(fig, width='stretch')
+
+    monitor['week'] = monitor['timestamp'].dt.to_period('W').dt.start_time
+    weekly_rows = []
+    for week, part in monitor.groupby('week', sort=True):
+        weekly_rows.append({
+            'week': week,
+            **regression_metrics(part['system_load'], part[predicted]),
+        })
+    weekly = pd.DataFrame(weekly_rows)
+    if weekly.empty:
+        st.info('Not enough data in the selected range to calculate monitoring metrics.')
     else:
-        st.info('No Evidently report generated yet. Click below to build one (requires evidently==0.7.19).')
-    if st.button('Generate / refresh Evidently report'):
-        try:
-            from visualization import build_evidently_report
-            with st.spinner('Evaluating full held-out period...'):
-                path = build_evidently_report()
-            st.success(f'Report saved: {path.relative_to(ROOT)}')
-            st.rerun()
-        except Exception as exc:
-            st.error(f'Evidently generation failed: {exc}')
-    st.caption('Evidently regression report uses the FULL fixed test period and LightGBM predictions. Sidebar filtering and capacity scenarios are handled by Streamlit.')
+        weekly['WAPE (%)'] = weekly['wape'] * 100
+        weekly['MAE'] = weekly['mae']
+        metric_choice = st.selectbox('Metric over time', ['WAPE (%)', 'MAE'], key='monitor_metric')
+        fig = go.Figure(go.Scatter(x=weekly['week'], y=weekly[metric_choice], mode='lines+markers'))
+        fig.update_layout(height=360, xaxis_title='Week', yaxis_title=metric_choice,
+                          margin=dict(l=8, r=8, t=24, b=8))
+        st.plotly_chart(fig, width='stretch')
+        st.dataframe(weekly[['week', 'mae', 'rmse', 'WAPE (%)']], width='stretch', hide_index=True)
+        st.download_button('Download weekly metrics CSV', weekly.to_csv(index=False).encode('utf-8'),
+                           file_name='weekly_monitoring_metrics.csv', mime='text/csv')
+
+    with st.expander('Dataset summary and field distributions'):
+        summary_cols = ['system_load', predicted]
+        if 'capacity_threshold' in df.columns:
+            summary_cols.append('capacity_threshold')
+        numeric_summary = df[summary_cols].describe().T
+        numeric_summary['missing'] = df[summary_cols].isna().sum()
+        st.markdown('**Numeric fields**')
+        st.dataframe(numeric_summary, width='stretch')
+        field_summary = pd.DataFrame({
+            'dtype': df.dtypes.astype(str),
+            'non-missing': df.notna().sum(),
+            'missing': df.isna().sum(),
+            'unique': df.nunique(dropna=True),
+        })
+        st.markdown('**All fields**')
+        st.dataframe(field_summary, width='stretch')
+        st.caption(f"Rows: {len(df):,} · Columns: {len(df.columns)} · Missing values: {int(df.isna().sum().sum())} · Duplicate rows: {int(df.duplicated().sum())}")
+        peak_counts = pd.DataFrame({
+            'Actual peak': alerts['actual_breach'].value_counts().reindex([False, True], fill_value=0),
+            'Forecast peak': alerts['forecast_breach'].value_counts().reindex([False, True], fill_value=0),
+        }, index=[False, True]).rename(index={False: 'Below threshold', True: 'At/above threshold'})
+        st.markdown('**Peak label distribution at the selected scenario threshold**')
+        st.bar_chart(peak_counts)
 
 st.divider()
 st.caption('Teaching baseline • 1-hour-ahead hourly forecasting • source load units unverified • 2017 data ≠ live grid telemetry')

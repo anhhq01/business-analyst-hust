@@ -7,4 +7,5 @@ if __name__ == '__main__':
     print('Pipeline complete.')
     print('Data quality:', quality)
     print('Model metrics:', metrics)
-    print('Run `python src/visualization.py` after installing Evidently to create the HTML report.')
+    print('Run `python src/visualization.py` to publish the test evaluation to Evidently UI.')
+    print('The script prints the PowerShell command to launch Evidently UI with this workspace.')

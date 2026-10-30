@@ -30,7 +30,7 @@ ba_capstone8_tetouan/
 │   ├── preprocessing.py     # main focus: quality, hourly aggregation, leakage-safe features
 │   ├── modeling.py          # seasonal naive + LightGBM baseline
 │   ├── evaluation.py        # forecast + peak metrics
-│   ├── visualization.py     # Evidently regression report
+│   ├── visualization.py     # publish Evidently evaluation to its UI workspace
 │   └── run_pipeline.py
 ├── tests/test_preprocessing.py
 ├── requirements.txt
@@ -77,7 +77,7 @@ The final 30 days form the test set and the preceding 30 days form validation. E
 
 For the final report, extend this to **rolling-origin backtesting** across several monthly/biweekly folds; the code is deliberately kept simple enough for a live class demo first.
 
-## 5. Evidently visualization
+## 5. Interactive Streamlit dashboard
 
 Install dependencies and run:
 
@@ -90,22 +90,22 @@ python -m venv .venv
 
 pip install -r requirements.txt
 python src/run_pipeline.py
+streamlit run app.py
+```
+
+Streamlit opens the dashboard at **http://localhost:8501**. It reads the saved historical predictions and metrics; it does not retrain the model. The dashboard includes forecast overview, error diagnostics, capacity scenario controls, and monitoring details such as R², MAPE, daily and weekly error trends, and dataset summaries. No HTML report is needed to use it.
+
+The **Capacity decisions** tab includes sensitivity sweeps for the threshold and reserve margin. They show changes in retrospective alert metrics and illustrative reserve quantities; they are not estimates of savings or real grid capacity. The plain-language recommendation and limitations are in [`docs/executive_brief.md`](docs/executive_brief.md). Dataset provenance and transformation choices are in [`docs/source_log.md`](docs/source_log.md). The original download date was not recorded and is explicitly marked unknown there.
+
+### Evidently UI (self-hosted)
+
+To add the fixed held-out LightGBM evaluation to Evidently's own UI, run:
+
+```bash
 python src/visualization.py
 ```
 
-Then open:
-
-```text
-reports/evidently_regression.html
-```
-
-The report includes regression performance and a compact data summary. For a local monitoring UI, Evidently 0.7 can also launch its self-hosted interface with:
-
-```bash
-evidently ui
-```
-
-The HTML report is preferable for presentation because it is deterministic and requires no server during the demo.
+The script prints a PowerShell command that sets `DO_NOT_TRACK=1` and starts `evidently ui --workspace ... --port 8000`. Run it in a second terminal, then open **http://localhost:8000**. The dashboard includes regression and data-quality summaries plus bar charts comparing actual/forecast load ranges and peak-breach counts. Open a stored report under the project to inspect the full regression and data-summary visualizations, including error distributions. The environment variable prevents Evidently telemetry from trying to write its user ID under the restricted Windows AppData folder. The first command creates or reuses the local Evidently project and adds a run; rerunning it adds another evaluation snapshot. The workspace is stored under the user's temporary directory to avoid Unicode-path write errors on Windows; keep that directory if you want to preserve snapshots. This is a historical batch evaluation, not live production monitoring. Streamlit remains available separately with `streamlit run app.py`.
 
 ## 6. Recommended live-demo story
 
@@ -124,7 +124,7 @@ Prioritize these, in order:
 1. rolling-origin backtesting and fold-level stability;
 2. explicit probabilistic forecast (LightGBM quantile at P10/P50/P90);
 3. empirical interval coverage and pinball loss;
-4. threshold sensitivity (P90/P95/P97.5 training load or a supplied business capacity);
+4. replace the illustrative threshold sweep with operator-approved capacity limits and the associated cost of false alerts/missed breaches;
 5. zone-specific versus pooled/combined models;
 6. SHAP only after validation is stable.
 
@@ -132,8 +132,8 @@ Do not jump to LSTM before the temporal baseline and business decision rule are 
 
 ---
 
-## Live browser demo (new)
+## Live browser demo
 
-Run `streamlit run app.py` after `pip install -r requirements.txt`; open **http://localhost:8501**. Uses the included historical predictions (no retraining necessary). Four tabs: Forecast overview, Error diagnostics, Capacity decisions, Evidently monitoring. Details and demo script: [`docs/dashboard_demo.md`](docs/dashboard_demo.md).
+Run `streamlit run app.py` after `pip install -r requirements.txt`; open **http://localhost:8501**. Uses the included historical predictions (no retraining necessary). Four tabs: Forecast overview, Error diagnostics, Capacity decisions, and Monitoring. Details and demo script: [`docs/dashboard_demo.md`](docs/dashboard_demo.md).
 
 This is an **interactive historical scenario demo**, not a live grid data feed. Changing the threshold or reserve margin recalculates evaluation/scenario outputs without retraining. The optional residual band is descriptive, not a validated prediction interval.
