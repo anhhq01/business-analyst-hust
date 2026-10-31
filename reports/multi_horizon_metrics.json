@@ -1,0 +1,164 @@
+{
+  "1h_ahead": {
+    "horizon_hours": 1,
+    "n_features": 63,
+    "min_feature_lag_hours": 1,
+    "lightgbm": {
+      "mae": 906.403073975396,
+      "rmse": 1255.3930317533905,
+      "wape": 0.014217902955199459,
+      "mase_vs_seasonal_naive": 0.5105376797751402
+    },
+    "ridge": {
+      "mae": 674.8442944754659,
+      "rmse": 974.5172861559358,
+      "wape": 0.010585655503836772,
+      "mase_vs_seasonal_naive": 0.38011062650075267
+    },
+    "seasonal_naive_168h": {
+      "mae": 1775.389182586111,
+      "rmse": 2619.8490899383137,
+      "wape": 0.027848880735818655
+    },
+    "probabilistic": {
+      "pinball_p10": 221.3816008098591,
+      "pinball_p50": 453.201536987698,
+      "pinball_p90": 222.56485209726154,
+      "mean_pinball_loss": 299.04932996493955,
+      "nominal_coverage": 0.8,
+      "empirical_coverage": 0.8833333333333333,
+      "coverage_error": 0.08333333333333326,
+      "below_lower_rate": 0.06944444444444445,
+      "above_upper_rate": 0.04722222222222222,
+      "mean_interval_width": 3465.4215732153193,
+      "winkler_score": 4439.464529071206
+    },
+    "peak_metrics": {
+      "capacity_threshold": 90061.25689466666,
+      "actual_breaches": 15,
+      "predicted_breaches": 16,
+      "breaches_correctly_anticipated": 12,
+      "false_alarms": 4,
+      "missed_breaches": 3,
+      "peak_precision": 0.75,
+      "peak_recall": 0.8,
+      "peak_f1": 0.7741935483870969,
+      "unmet_exceedance_volume": 1527.1012255121896,
+      "daily_peak_mae": 947.8669201922695,
+      "daily_peak_wape": 0.010724221088133248,
+      "coincident_peak_mae": 1019.8781303172494,
+      "coincident_peak_underprediction_rate": 0.36666666666666664,
+      "mean_abs_peak_timing_error_hours": 0.23333333333333334,
+      "exact_peak_hour_match_rate": 0.8,
+      "within_1h_peak_timing_rate": 0.9666666666666667
+    }
+  },
+  "6h_ahead": {
+    "horizon_hours": 6,
+    "n_features": 61,
+    "min_feature_lag_hours": 6,
+    "lightgbm": {
+      "mae": 1343.7260991820183,
+      "rmse": 1959.819895596673,
+      "wape": 0.021077782969938664,
+      "mase_vs_seasonal_naive": 0.7568628401941072
+    },
+    "ridge": {
+      "mae": 1539.9564376666308,
+      "rmse": 2107.8785405750386,
+      "wape": 0.024155865987909426,
+      "mase_vs_seasonal_naive": 0.8673909094249755
+    },
+    "seasonal_naive_168h": {
+      "mae": 1775.389182586111,
+      "rmse": 2619.8490899383137,
+      "wape": 0.027848880735818655
+    },
+    "probabilistic": {
+      "pinball_p10": 434.3127613308988,
+      "pinball_p50": 671.7203839286368,
+      "pinball_p90": 377.3354453288239,
+      "mean_pinball_loss": 494.4561968627865,
+      "nominal_coverage": 0.8,
+      "empirical_coverage": 0.8916666666666667,
+      "coverage_error": 0.09166666666666667,
+      "below_lower_rate": 0.06666666666666667,
+      "above_upper_rate": 0.041666666666666664,
+      "mean_interval_width": 6399.937153929863,
+      "winkler_score": 8116.482066597228
+    },
+    "peak_metrics": {
+      "capacity_threshold": 90083.82081766668,
+      "actual_breaches": 15,
+      "predicted_breaches": 12,
+      "breaches_correctly_anticipated": 9,
+      "false_alarms": 3,
+      "missed_breaches": 6,
+      "peak_precision": 0.75,
+      "peak_recall": 0.6,
+      "peak_f1": 0.6666666666666665,
+      "unmet_exceedance_volume": 3403.5753388645244,
+      "daily_peak_mae": 1274.598978957526,
+      "daily_peak_wape": 0.014420886474523987,
+      "coincident_peak_mae": 1396.6016894872382,
+      "coincident_peak_underprediction_rate": 0.43333333333333335,
+      "mean_abs_peak_timing_error_hours": 0.43333333333333335,
+      "exact_peak_hour_match_rate": 0.6666666666666666,
+      "within_1h_peak_timing_rate": 0.9
+    }
+  },
+  "24h_ahead": {
+    "horizon_hours": 24,
+    "n_features": 53,
+    "min_feature_lag_hours": 24,
+    "lightgbm": {
+      "mae": 1469.3447887638695,
+      "rmse": 2215.2033325562516,
+      "wape": 0.02304824665118007,
+      "mase_vs_seasonal_naive": 0.8276184192040398
+    },
+    "ridge": {
+      "mae": 1657.170773932779,
+      "rmse": 2353.801473599681,
+      "wape": 0.025994498386496645,
+      "mase_vs_seasonal_naive": 0.9334126794210101
+    },
+    "seasonal_naive_168h": {
+      "mae": 1775.389182586111,
+      "rmse": 2619.8490899383137,
+      "wape": 0.027848880735818655
+    },
+    "probabilistic": {
+      "pinball_p10": 458.4024303846876,
+      "pinball_p50": 734.6723943819347,
+      "pinball_p90": 354.7473387529595,
+      "mean_pinball_loss": 515.940721173194,
+      "nominal_coverage": 0.8,
+      "empirical_coverage": 0.8569444444444444,
+      "coverage_error": 0.05694444444444435,
+      "below_lower_rate": 0.09166666666666666,
+      "above_upper_rate": 0.05138888888888889,
+      "mean_interval_width": 6069.745342717308,
+      "winkler_score": 8131.497691376472
+    },
+    "peak_metrics": {
+      "capacity_threshold": 90106.75910133336,
+      "actual_breaches": 15,
+      "predicted_breaches": 15,
+      "breaches_correctly_anticipated": 11,
+      "false_alarms": 4,
+      "missed_breaches": 4,
+      "peak_precision": 0.7333333333333333,
+      "peak_recall": 0.7333333333333333,
+      "peak_f1": 0.7333333333333333,
+      "unmet_exceedance_volume": 3840.695641496408,
+      "daily_peak_mae": 1832.7473351527758,
+      "daily_peak_wape": 0.02073580921768907,
+      "coincident_peak_mae": 1767.644380920404,
+      "coincident_peak_underprediction_rate": 0.5333333333333333,
+      "mean_abs_peak_timing_error_hours": 0.36666666666666664,
+      "exact_peak_hour_match_rate": 0.7333333333333333,
+      "within_1h_peak_timing_rate": 0.9
+    }
+  }
+}

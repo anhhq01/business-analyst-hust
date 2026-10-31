@@ -11,26 +11,176 @@
     "test_rows": 720
   },
   "seasonal_naive": {
-    "mae": 1775.389182586111,
+    "mae": 1775.3891825861112,
     "rmse": 2619.8490899383137,
-    "wape": 0.027848880735818655
+    "wape": 0.027848880735818662
+  },
+  "seasonal_naive_24h": {
+    "mae": 2071.536491995139,
+    "rmse": 3296.2917024682397,
+    "wape": 0.0324942684518529,
+    "mase_vs_seasonal_naive": 1.1668069808658215
+  },
+  "ridge_regression": {
+    "mae": 674.8442944754638,
+    "rmse": 974.5172861559425,
+    "wape": 0.01058565550383674,
+    "mase_vs_seasonal_naive": 0.3801106265007515
   },
   "lightgbm": {
-    "mae": 1320.1144196069447,
-    "rmse": 1886.362019103046,
-    "wape": 0.020707408488158417,
-    "mase_vs_seasonal_naive": 0.7435634015095255
+    "mae": 903.8291930990798,
+    "rmse": 1250.3463433823927,
+    "wape": 0.014177528877078557,
+    "mase_vs_seasonal_naive": 0.5090879239122781
+  },
+  "lightgbm_probabilistic_raw": {
+    "pinball_p10": 230.8122041754393,
+    "pinball_p50": 451.9145965495399,
+    "pinball_p90": 212.50326404887537,
+    "mean_pinball_loss": 298.4100215912849,
+    "nominal_coverage": 0.8,
+    "empirical_coverage": 0.7694444444444445,
+    "coverage_error": -0.030555555555555558,
+    "below_lower_rate": 0.11944444444444445,
+    "above_upper_rate": 0.1111111111111111,
+    "mean_interval_width": 2775.6029197876846,
+    "winkler_score": 4433.154682243147
+  },
+  "lightgbm_probabilistic_calibrated": {
+    "pinball_p10": 233.36007584188474,
+    "pinball_p50": 451.9145965495399,
+    "pinball_p90": 217.77881224145034,
+    "mean_pinball_loss": 301.0178282109584,
+    "nominal_coverage": 0.8,
+    "empirical_coverage": 0.8777777777777778,
+    "coverage_error": 0.07777777777777772,
+    "below_lower_rate": 0.0625,
+    "above_upper_rate": 0.059722222222222225,
+    "mean_interval_width": 3477.8176184666645,
+    "winkler_score": 4511.388880833352,
+    "validation_cqr_padding": 351.10734933949027
   },
   "peak_capacity_scenario": {
     "capacity_threshold": 90061.25689466666,
     "actual_breaches": 15,
-    "predicted_breaches": 22,
-    "breaches_correctly_anticipated": 13,
-    "peak_precision": 0.5909090909090909,
-    "peak_recall": 0.8666666666666667
+    "predicted_breaches": 17,
+    "breaches_correctly_anticipated": 14,
+    "false_alarms": 3,
+    "missed_breaches": 1,
+    "peak_precision": 0.8235294117647058,
+    "peak_recall": 0.9333333333333333,
+    "peak_f1": 0.8749999999999999,
+    "unmet_exceedance_volume": 1302.103890220169,
+    "daily_peak_mae": 861.0130085230151,
+    "daily_peak_wape": 0.009741550914432762,
+    "coincident_peak_mae": 985.1833971217653,
+    "coincident_peak_underprediction_rate": 0.36666666666666664,
+    "mean_abs_peak_timing_error_hours": 0.26666666666666666,
+    "exact_peak_hour_match_rate": 0.7666666666666667,
+    "within_1h_peak_timing_rate": 0.9666666666666667
   },
-  "best_iteration": 477,
-  "n_features": 55,
+  "peak_capacity_scenario_p90_policy": {
+    "capacity_threshold": 90061.25689466666,
+    "actual_breaches": 15,
+    "predicted_breaches": 39,
+    "breaches_correctly_anticipated": 14,
+    "false_alarms": 25,
+    "missed_breaches": 1,
+    "peak_precision": 0.358974358974359,
+    "peak_recall": 0.9333333333333333,
+    "peak_f1": 0.5185185185185185,
+    "unmet_exceedance_volume": 787.7756203333411,
+    "daily_peak_mae": 2041.9285009483438,
+    "daily_peak_wape": 0.023102497010749814,
+    "coincident_peak_mae": 1833.398844008369,
+    "coincident_peak_underprediction_rate": 0.1,
+    "mean_abs_peak_timing_error_hours": 0.4,
+    "exact_peak_hour_match_rate": 0.6333333333333333,
+    "within_1h_peak_timing_rate": 0.9666666666666667
+  },
+  "threshold_percentiles_train": {
+    "P80": 90061.25689466666,
+    "P90": 95872.36326466665,
+    "P95": 100971.89666358333,
+    "P97.5": 109924.84164179169
+  },
+  "explainability_summary": {
+    "base_value": 72692.6795562772,
+    "top_10_shap_features": [
+      {
+        "feature": "load_lag_24h",
+        "mean_abs_shap": 9853.151335872459,
+        "permutation_mae_increase": 9085.165259285635,
+        "permutation_mae_std": 329.1470278394104,
+        "lgbm_gain": 261343.18113088608
+      },
+      {
+        "feature": "load_lag_168h",
+        "mean_abs_shap": 2070.5548775234392,
+        "permutation_mae_increase": 1727.297364875723,
+        "permutation_mae_std": 72.52914029162328,
+        "lgbm_gain": 51281.52752947807
+      },
+      {
+        "feature": "load_lag_1h",
+        "mean_abs_shap": 1779.429636340255,
+        "permutation_mae_increase": 1228.8493504263006,
+        "permutation_mae_std": 79.75499105807134,
+        "lgbm_gain": 46365.61048412323
+      },
+      {
+        "feature": "load_diff_24h",
+        "mean_abs_shap": 1137.2590456406328,
+        "permutation_mae_increase": 1123.932116470932,
+        "permutation_mae_std": 19.91698037777937,
+        "lgbm_gain": 61507.72108030319
+      },
+      {
+        "feature": "load_lag_48h",
+        "mean_abs_shap": 799.0047471961069,
+        "permutation_mae_increase": 739.3169621845052,
+        "permutation_mae_std": 24.847347852923544,
+        "lgbm_gain": 21241.410809993744
+      },
+      {
+        "feature": "load_ramp_1h",
+        "mean_abs_shap": 245.8674325308183,
+        "permutation_mae_increase": 179.70075951002747,
+        "permutation_mae_std": 16.66591835578111,
+        "lgbm_gain": 10793.63613319397
+      },
+      {
+        "feature": "load_lag_72h",
+        "mean_abs_shap": 199.21544304354572,
+        "permutation_mae_increase": 80.40235492933103,
+        "permutation_mae_std": 10.600210634651216,
+        "lgbm_gain": 7055.910276174545
+      },
+      {
+        "feature": "load_roll_max_6h",
+        "mean_abs_shap": 192.38202292293215,
+        "permutation_mae_increase": 69.4175210518617,
+        "permutation_mae_std": 15.943908035730258,
+        "lgbm_gain": 3874.36372423172
+      },
+      {
+        "feature": "dayofyear",
+        "mean_abs_shap": 153.79126195614694,
+        "permutation_mae_increase": 0.0,
+        "permutation_mae_std": 0.0,
+        "lgbm_gain": 2772.7409992218018
+      },
+      {
+        "feature": "dayofweek",
+        "mean_abs_shap": 146.2367824490774,
+        "permutation_mae_increase": 46.682829067139394,
+        "permutation_mae_std": 6.06886831904949,
+        "lgbm_gain": 6225.995243310928
+      }
+    ]
+  },
+  "best_iteration": 1000,
+  "n_features": 63,
   "features": [
     "hour",
     "dayofweek",
@@ -49,6 +199,7 @@
     "load_lag_6h",
     "load_lag_12h",
     "load_lag_24h",
+    "load_lag_25h",
     "load_lag_48h",
     "load_lag_72h",
     "load_lag_168h",
@@ -67,6 +218,8 @@
     "load_roll_mean_168h",
     "load_roll_std_168h",
     "load_roll_max_168h",
+    "load_ramp_1h",
+    "load_diff_24h",
     "temperature_lag_1h",
     "temperature_lag_24h",
     "temperature_roll_mean_6h",
@@ -86,6 +239,57 @@
     "diffuse_flows_lag_1h",
     "diffuse_flows_lag_24h",
     "diffuse_flows_roll_mean_6h",
-    "diffuse_flows_roll_mean_24h"
-  ]
+    "diffuse_flows_roll_mean_24h",
+    "cooling_degree_proxy",
+    "heating_degree_proxy",
+    "temp_x_hour_sin",
+    "temp_x_hour_cos",
+    "temp_x_humidity"
+  ],
+  "rolling_backtest_aggregate": {
+    "lightgbm_wape_mean": 0.0161793366183517,
+    "lightgbm_wape_std": 0.004363452263920555,
+    "lightgbm_mase_mean": 0.4228144140184315,
+    "ridge_wape_mean": 0.01549788990808948,
+    "seasonal_naive_wape_mean": 0.04124819137961798,
+    "empirical_coverage_80_mean": 0.8141666666666666,
+    "mean_pinball_loss_mean": 380.4811217078508,
+    "daily_peak_wape_mean": 0.01617473348365238,
+    "mean_abs_peak_timing_error_hours": 0.21333333333333332
+  },
+  "multi_horizon_summary": {
+    "1h_ahead": {
+      "lightgbm_wape": 0.014217902955199459,
+      "lightgbm_mase": 0.5105376797751402,
+      "empirical_coverage_80": 0.8833333333333333,
+      "mean_pinball_loss": 299.04932996493955,
+      "peak_recall_p80": 0.8,
+      "mean_abs_peak_timing_error_hours": 0.23333333333333334
+    },
+    "6h_ahead": {
+      "lightgbm_wape": 0.021077782969938664,
+      "lightgbm_mase": 0.7568628401941072,
+      "empirical_coverage_80": 0.8916666666666667,
+      "mean_pinball_loss": 494.4561968627865,
+      "peak_recall_p80": 0.6,
+      "mean_abs_peak_timing_error_hours": 0.43333333333333335
+    },
+    "24h_ahead": {
+      "lightgbm_wape": 0.02304824665118007,
+      "lightgbm_mase": 0.8276184192040398,
+      "empirical_coverage_80": 0.8569444444444444,
+      "mean_pinball_loss": 515.940721173194,
+      "peak_recall_p80": 0.7333333333333333,
+      "mean_abs_peak_timing_error_hours": 0.36666666666666664
+    }
+  },
+  "zone_comparison_summary": {
+    "direct_combined_wape": 0.014217902955199459,
+    "bottom_up_sum_wape": 0.014859226360476,
+    "zone_wapes": {
+      "Zone 1 Power Consumption": 0.017576104408986354,
+      "Zone 2 Power Consumption": 0.020818271468613463,
+      "Zone 3 Power Consumption": 0.03478590388239865
+    }
+  }
 }

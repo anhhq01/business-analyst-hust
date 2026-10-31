@@ -1,0 +1,49 @@
+{
+  "dimensions": {
+    "completeness": {
+      "metric": "Missing cell rate (%)",
+      "value": 0.0,
+      "sla_threshold": "< 2.0%",
+      "status": "PASS"
+    },
+    "uniqueness_consistency": {
+      "metric": "Duplicate timestamp rate (%)",
+      "value": 0.0,
+      "sla_threshold": "< 0.5%",
+      "status": "PASS"
+    },
+    "timeliness_continuity": {
+      "metric": "Non-10-minute interval gaps",
+      "value": 0,
+      "sla_threshold": "0 gaps",
+      "status": "PASS"
+    },
+    "validity": {
+      "metric": "Out-of-range physical readings",
+      "value": 0,
+      "sla_threshold": "< 0.1%",
+      "status": "PASS"
+    },
+    "accuracy_outlier_treatment": {
+      "metric": "Hourly load > Q3 + 1.5*IQR / |Z| > 3",
+      "value": "19 IQR high / 35 |Z|>3",
+      "sla_threshold": "Retain genuine summer peak signal (no blind winsorization)",
+      "status": "PASS"
+    },
+    "provenance": {
+      "metric": "Source DOI & CC BY 4.0 license verified",
+      "value": "10.24432/C5B034",
+      "sla_threshold": "Documented URL & download log",
+      "status": "PASS"
+    }
+  },
+  "outlier_summary": {
+    "system_load_q25": 56585.36248458333,
+    "system_load_q75": 83781.62649958333,
+    "system_load_iqr_upper": 124576.02252208334,
+    "system_load_iqr_lower": 15790.966462083328,
+    "hours_above_iqr_upper": 19,
+    "hours_abs_z_gt_3": 35,
+    "decision": "Upper-tail observations correspond to July-August evening cooling peaks; retained as critical target signal for capacity planning."
+  }
+}

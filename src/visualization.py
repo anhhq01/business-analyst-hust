@@ -1,9 +1,35 @@
-"""Publish the held-out regression evaluation to the local Evidently UI workspace."""
+"""Generate an Evidently regression HTML report and/or publish to the local Evidently UI workspace."""
 from __future__ import annotations
 
 import pandas as pd
 
-from config import EVIDENTLY_PROJECT_NAME, EVIDENTLY_WORKSPACE, PREDICTIONS
+from config import EVIDENTLY_HTML, EVIDENTLY_PROJECT_NAME, EVIDENTLY_WORKSPACE, PREDICTIONS
+
+
+def build_evidently_report(predictions_path=PREDICTIONS, output_path=EVIDENTLY_HTML):
+    """Generate a self-contained Evidently HTML regression & data summary report."""
+    from evidently import Dataset, DataDefinition, Report
+    from evidently.core.datasets import Regression
+    from evidently.presets import DataSummaryPreset, RegressionPreset
+
+    df = pd.read_csv(predictions_path, parse_dates=['timestamp'])
+    eval_df = df.rename(columns={
+        'system_load': 'target',
+        'prediction_lgbm': 'prediction',
+    }).copy()
+
+    definition = DataDefinition(
+        timestamp='timestamp',
+        numerical_columns=['target', 'prediction', 'capacity_threshold'],
+        categorical_columns=['actual_peak', 'predicted_peak'],
+        regression=[Regression(target='target', prediction='prediction')],
+    )
+    dataset = Dataset.from_pandas(eval_df, data_definition=definition)
+    report = Report([RegressionPreset(), DataSummaryPreset()])
+    snapshot = report.run(dataset, None, name='tetouan_1h_forecast_test')
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    snapshot.save_html(str(output_path))
+    return output_path
 
 
 def configure_evidently_dashboard(project):
@@ -17,8 +43,6 @@ def configure_evidently_dashboard(project):
         tab.panels = list(dict.fromkeys(tab.panels))
     dashboard._workspace.save_dashboard(project.id, dashboard_model)
 
-    # The stored snapshots all evaluate the same fixed test period, so a trend
-    # line across runs would imply temporal monitoring that the data does not provide.
     for obsolete_title in (
         'MAE across evaluation runs',
         'Dataset size',
@@ -76,26 +100,26 @@ def configure_evidently_dashboard(project):
         (
             'Data profile',
             DashboardPanelPlot(
-            title='Actual vs forecast load range',
-            subtitle='Compare the actual and predicted load distribution summaries, in source units.',
+                title='Actual vs forecast load range',
+                subtitle='Compare the actual and predicted load distribution summaries, in source units.',
                 size='full',
                 values=[
-                PanelMetric(legend='Actual min', metric='MinValue', metric_labels={'column': 'target'}),
-                PanelMetric(legend='Actual mean', metric='MeanValue', metric_labels={'column': 'target'}),
-                PanelMetric(legend='Actual max', metric='MaxValue', metric_labels={'column': 'target'}),
-                PanelMetric(legend='Forecast min', metric='MinValue', metric_labels={'column': 'prediction'}),
-                PanelMetric(legend='Forecast mean', metric='MeanValue', metric_labels={'column': 'prediction'}),
-                PanelMetric(legend='Forecast max', metric='MaxValue', metric_labels={'column': 'prediction'}),
+                    PanelMetric(legend='Actual min', metric='MinValue', metric_labels={'column': 'target'}),
+                    PanelMetric(legend='Actual mean', metric='MeanValue', metric_labels={'column': 'target'}),
+                    PanelMetric(legend='Actual max', metric='MaxValue', metric_labels={'column': 'target'}),
+                    PanelMetric(legend='Forecast min', metric='MinValue', metric_labels={'column': 'prediction'}),
+                    PanelMetric(legend='Forecast mean', metric='MeanValue', metric_labels={'column': 'prediction'}),
+                    PanelMetric(legend='Forecast max', metric='MaxValue', metric_labels={'column': 'prediction'}),
                 ],
-            plot_params={'plot_type': 'bar', 'is_stacked': False},
+                plot_params={'plot_type': 'bar', 'is_stacked': False},
             ),
         ),
         (
             'Data profile',
             DashboardPanelPlot(
-            title='Peak breach comparison',
-            subtitle='Hours above and below the training-derived scenario threshold.',
-            size='half',
+                title='Peak breach comparison',
+                subtitle='Hours above and below the training-derived scenario threshold.',
+                size='half',
                 values=[
                     PanelMetric(legend='Actual breach hours', metric='UniqueValueCount',
                                 metric_labels={'column': 'actual_peak', 'label': '1', 'value_type': 'count'}),
@@ -106,7 +130,7 @@ def configure_evidently_dashboard(project):
                     PanelMetric(legend='Predicted below threshold', metric='UniqueValueCount',
                                 metric_labels={'column': 'predicted_peak', 'label': '0', 'value_type': 'count'}),
                 ],
-            plot_params={'plot_type': 'bar', 'is_stacked': False},
+                plot_params={'plot_type': 'bar', 'is_stacked': False},
             ),
         ),
     ]
@@ -117,7 +141,6 @@ def configure_evidently_dashboard(project):
             dashboard.add_panel(panel, tab=tab)
             existing_titles.add(panel.title)
 
-    # Evidently 0.7.19 duplicates panel references when adding to an existing tab.
     dashboard_model = dashboard.model()
     for tab in dashboard_model.tabs:
         tab.panels = list(dict.fromkeys(tab.panels))
@@ -165,6 +188,8 @@ def publish_evidently_run(predictions_path=PREDICTIONS):
 
 
 if __name__ == '__main__':
+    html_path = build_evidently_report()
+    print(f'Saved Evidently HTML report: {html_path}')
     project = publish_evidently_run()
     print(f'Added evaluation run to Evidently project: {project.name} ({project.id})')
     print(f'Workspace: {EVIDENTLY_WORKSPACE}')

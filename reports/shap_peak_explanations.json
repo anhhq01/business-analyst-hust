@@ -1,0 +1,176 @@
+[
+  {
+    "timestamp": "2017-12-27 18:00:00",
+    "actual_load": 91627.91264666666,
+    "predicted_load": 92677.95263557327,
+    "base_value": 72692.6795562772,
+    "top_contributions": [
+      {
+        "feature": "load_lag_24h",
+        "feature_value": 91489.93903166668,
+        "shap_contribution": 13784.153486706857
+      },
+      {
+        "feature": "load_lag_168h",
+        "feature_value": 90833.952585,
+        "shap_contribution": 1779.7441286407843
+      },
+      {
+        "feature": "load_lag_1h",
+        "feature_value": 84985.22767833332,
+        "shap_contribution": 1377.3103090381458
+      },
+      {
+        "feature": "load_lag_48h",
+        "feature_value": 91429.88465833332,
+        "shap_contribution": 1218.2508438377138
+      },
+      {
+        "feature": "load_ramp_1h",
+        "feature_value": 14644.13510333332,
+        "shap_contribution": 615.6256430348051
+      },
+      {
+        "feature": "load_diff_24h",
+        "feature_value": 714.0319666666473,
+        "shap_contribution": 603.4075168792195
+      },
+      {
+        "feature": "load_lag_72h",
+        "feature_value": 83829.933045,
+        "shap_contribution": 247.3672069067211
+      },
+      {
+        "feature": "hour_sin",
+        "feature_value": -1.0,
+        "shap_contribution": 154.01061416372514
+      },
+      {
+        "feature": "dayofyear",
+        "feature_value": 361.0,
+        "shap_contribution": -143.97197716727376
+      },
+      {
+        "feature": "load_roll_max_6h",
+        "feature_value": 84985.22767833332,
+        "shap_contribution": 103.40293296552102
+      }
+    ]
+  },
+  {
+    "timestamp": "2017-12-26 18:00:00",
+    "actual_load": 91489.93903166668,
+    "predicted_load": 91216.51409763654,
+    "base_value": 72692.6795562772,
+    "top_contributions": [
+      {
+        "feature": "load_lag_24h",
+        "feature_value": 91429.88465833332,
+        "shap_contribution": 13678.350649703145
+      },
+      {
+        "feature": "load_lag_168h",
+        "feature_value": 91273.36524833334,
+        "shap_contribution": 1730.589179836894
+      },
+      {
+        "feature": "load_lag_1h",
+        "feature_value": 84271.19571166667,
+        "shap_contribution": 1258.638660491875
+      },
+      {
+        "feature": "load_lag_48h",
+        "feature_value": 83829.933045,
+        "shap_contribution": 781.8928665923403
+      },
+      {
+        "feature": "load_ramp_1h",
+        "feature_value": 14541.946745000008,
+        "shap_contribution": 647.0346143215904
+      },
+      {
+        "feature": "load_lag_72h",
+        "feature_value": 88646.50186833332,
+        "shap_contribution": 260.46739007413305
+      },
+      {
+        "feature": "hour_sin",
+        "feature_value": -1.0,
+        "shap_contribution": 171.50607911264794
+      },
+      {
+        "feature": "dayofyear",
+        "feature_value": 360.0,
+        "shap_contribution": -156.3151638408733
+      },
+      {
+        "feature": "load_diff_24h",
+        "feature_value": -90.54962833331956,
+        "shap_contribution": -132.0893655406157
+      },
+      {
+        "feature": "dayofweek",
+        "feature_value": 1.0,
+        "shap_contribution": 116.36697047931267
+      }
+    ]
+  },
+  {
+    "timestamp": "2017-12-25 18:00:00",
+    "actual_load": 91429.88465833332,
+    "predicted_load": 91843.91415600726,
+    "base_value": 72692.6795562772,
+    "top_contributions": [
+      {
+        "feature": "load_lag_24h",
+        "feature_value": 83829.933045,
+        "shap_contribution": 8353.542654224364
+      },
+      {
+        "feature": "load_diff_24h",
+        "feature_value": 9293.832358333326,
+        "shap_contribution": 5150.835004492537
+      },
+      {
+        "feature": "load_lag_168h",
+        "feature_value": 90849.032515,
+        "shap_contribution": 1920.783710322767
+      },
+      {
+        "feature": "load_lag_1h",
+        "feature_value": 84361.74534,
+        "shap_contribution": 1419.9104637008434
+      },
+      {
+        "feature": "load_lag_48h",
+        "feature_value": 88646.50186833332,
+        "shap_contribution": 1270.6468076289768
+      },
+      {
+        "feature": "load_ramp_1h",
+        "feature_value": 15434.733082499995,
+        "shap_contribution": 552.3591886527918
+      },
+      {
+        "feature": "load_lag_72h",
+        "feature_value": 87928.116775,
+        "shap_contribution": 271.2363888353614
+      },
+      {
+        "feature": "hour_sin",
+        "feature_value": -1.0,
+        "shap_contribution": 199.29649802371577
+      },
+      {
+        "feature": "load_roll_mean_24h",
+        "feature_value": 64830.93754813889,
+        "shap_contribution": -188.0168199181241
+      },
+      {
+        "feature": "temperature_roll_mean_24h",
+        "feature_value": 11.073145833333331,
+        "shap_contribution": -133.9893228818995
+      }
+    ]
+  }
+]
