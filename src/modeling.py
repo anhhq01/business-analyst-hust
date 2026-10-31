@@ -33,7 +33,7 @@ EXCLUDE = {
 
 def temporal_split(df: pd.DataFrame, test_days: int = TEST_DAYS, valid_days: int = VALID_DAYS):
     df = df.sort_values('timestamp').copy()
-    test_start = df['timestamp'].max() - pd.to_timedelta((test_days * 24) - 1, unit='h')
+    test_start = df['timestamp'].max() - pd.to_timedelta(test_days * 24 - 1, unit='h')
     valid_start = test_start - pd.to_timedelta(valid_days * 24, unit='h')
     train = df[df['timestamp'] < valid_start].copy()
     valid = df[(df['timestamp'] >= valid_start) & (df['timestamp'] < test_start)].copy()
@@ -215,9 +215,9 @@ def run_rolling_backtest(df: pd.DataFrame, n_folds: int = 5, fold_days: int = 30
 
     for k in range(n_folds, 0, -1):
         fold_id = n_folds - k + 1
-        test_end = max_ts - pd.Timedelta(days=(k - 1) * fold_days)
-        test_start = test_end - pd.Timedelta(days=fold_days) + pd.Timedelta(hours=1)
-        valid_start = test_start - pd.Timedelta(days=14)
+        test_end = max_ts - pd.to_timedelta((k - 1) * fold_days * 24, unit='h')
+        test_start = test_end - pd.to_timedelta(fold_days * 24 - 1, unit='h')
+        valid_start = test_start - pd.to_timedelta(14 * 24, unit='h')
 
         train_f = df[df['timestamp'] < valid_start]
         valid_f = df[(df['timestamp'] >= valid_start) & (df['timestamp'] < test_start)]

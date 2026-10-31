@@ -23,7 +23,7 @@ Reproducible analytics pipeline, probabilistic forecasting suite, capacity-plann
 ```text
 business-analyst-hust/
 ├── app.py                                 # 5-tab interactive Streamlit decision dashboard
-├── DEMO_SCENARIO.md                       # Step-by-step live presentation & demo script
+├── DEMO_SCENARIO.md                       # Step-by-step live demo scenarios, speaker split & Q&A guide
 ├── requirements.txt                       # Locked Python dependencies
 ├── LICENSE_DATA.md                        # UCI CC BY 4.0 attribution
 ├── data/

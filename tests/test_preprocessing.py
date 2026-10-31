@@ -89,3 +89,12 @@ def test_threshold_sensitivity_table():
     )
     assert not sens.empty
     assert {'threshold_percentile', 'policy', 'peak_recall', 'scenario_total_cost_10to1'}.issubset(sens.columns)
+
+
+def test_streamlit_dashboard_renders_without_error():
+    from streamlit.testing.v1 import AppTest
+    at = AppTest.from_file(str(ROOT / 'app.py')).run(timeout=30)
+    assert len(at.exception) == 0, f"Dashboard raised exception: {at.exception}"
+    assert len(at.tabs) == 5
+    assert len(at.metric) >= 10
+
